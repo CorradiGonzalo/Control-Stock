@@ -44,3 +44,45 @@ public void guardar(Herramienta h) {
         //Ignoramos el error para no duplicar codigo.
     }
 }
+
+@Override
+public Herramienta buscarPorCodigo(String codigo) {
+    String sql = "SELECT * FROM inventario WHERE codigo = ?";
+    Herramienta resultado = null;
+
+    try (Connection conn = ConexionDB.conectar();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) { 
+        
+        pstmt.setString(1, codigo);
+        ResultSet rs = pstmt.executeQuery();
+
+        if (rs.next()) {
+            String tipo = rs.getString("discriminador");
+            String extras = rs.getString("datos_extra");
+
+            if (tipo.equals("FRESA")) {
+                String[] datos = extras.split(",");
+                resultado = new Fresa(
+                    rs.getString("codigo"),
+                    rs.getDouble("precio_base"),
+                    rs.getInt("stock"),
+                    Integer.parseInt(datos[0]), // Dientes
+                    datos[1]                    // Tipo Corte
+                );
+            } else if (tipo.equals("MECHA")) {
+                String[] datos = extras.split(",");
+                resultado = new Mecha(
+                    rs.getString("codigo"),
+                    rs.getDouble("precio_base"),
+                    rs.getInt("stock"),
+                    datos[0],                   // Material
+                    Integer.parseInt(datos[1])  // Angulo
+                );
+            }
+            if (resultado != null) resultado.setId(rs.getInt("id"));
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al buscar: " + e.getMessage());
+    }
+    return resultado;
+}
