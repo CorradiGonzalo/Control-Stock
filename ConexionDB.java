@@ -11,7 +11,7 @@ public class ConexionDB {
         try {
             conn = DriverManager.getConnection(URL);
         } catch (SQLException e) {
-            System.out.printIn("Error critico de conexión: " + e.getMessage());
+            System.out.println("Error critico de conexión: " + e.getMessage());
         }
         return conn;
     }

@@ -6,7 +6,7 @@ public abstract class Herramienta {
 
     public Herramienta(String codigo, double precioBase, int stock) {
         this.codigo = codigo;
-        this precioBase = precioBase;
+        this.precioBase = precioBase;
         this.stock = stock;
     }
 

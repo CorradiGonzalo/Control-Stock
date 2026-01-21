@@ -12,7 +12,7 @@ public class CotizadorService {
 
         //Verificacion de stock
         if (h.getStock() < cantidadRequerida) {
-            System.out.printIn("ALERTA DE STOCK: Se requieren " + cantidadRequerida + " unidades pero hay " + h.getStock() + " en stock.db");   
+            System.out.println("ALERTA DE STOCK: Se requieren " + cantidadRequerida + " unidades pero hay " + h.getStock() + " en stock.db");   
         } else { System.out.println("Stock Suficiente (" + h.getStock() + " disponible).");
         }
 
