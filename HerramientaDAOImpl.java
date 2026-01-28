@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HerramientaDAOImpl implements HerramientaDAO {
 
@@ -60,33 +62,58 @@ public class HerramientaDAOImpl implements HerramientaDAO {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                String tipo = rs.getString("discriminador");
-                String extras = rs.getString("datos_extra");
-
-                if (tipo.equals("FRESA")) {
-                    String[] datos = extras.split(",");
-                    resultado = new Fresa(
-                        rs.getString("codigo"),
-                        rs.getDouble("precio_base"),
-                        rs.getInt("stock"),
-                        Integer.parseInt(datos[0]), // Dientes
-                        datos[1]                    // Tipo Corte
-                    );
-                } else if (tipo.equals("MECHA")) {
-                    String[] datos = extras.split(",");
-                    resultado = new Mecha(
-                        rs.getString("codigo"),
-                        rs.getDouble("precio_base"),
-                        rs.getInt("stock"),
-                        datos[0],                   // Material
-                        Integer.parseInt(datos[1])  // Angulo
-                    );
-                }
-                if (resultado != null) resultado.setId(rs.getInt("id"));
+                resultado = fromResultSet(rs);
             }
         } catch (SQLException e) {
             System.out.println("Error al buscar: " + e.getMessage());
         }
         return resultado;
+    }
+
+    @Override
+    public List<Herramienta> listarTodos() {
+        String sql = "SELECT * FROM inventario ORDER BY codigo";
+        List<Herramienta> lista = new ArrayList<>();
+
+        try (Connection conn = ConexionDB.conectar();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Herramienta h = fromResultSet(rs);
+                if (h != null) lista.add(h);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al listar: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    private Herramienta fromResultSet(ResultSet rs) throws SQLException {
+        String tipo = rs.getString("discriminador");
+        String extras = rs.getString("datos_extra");
+        Herramienta h = null;
+
+        if ("FRESA".equals(tipo)) {
+            String[] datos = extras.split(",");
+            h = new Fresa(
+                rs.getString("codigo"),
+                rs.getDouble("precio_base"),
+                rs.getInt("stock"),
+                Integer.parseInt(datos[0]),
+                datos[1]
+            );
+        } else if ("MECHA".equals(tipo)) {
+            String[] datos = extras.split(",");
+            h = new Mecha(
+                rs.getString("codigo"),
+                rs.getDouble("precio_base"),
+                rs.getInt("stock"),
+                datos[0],
+                Integer.parseInt(datos[1])
+            );
+        }
+        if (h != null) h.setId(rs.getInt("id"));
+        return h;
     }
 }
