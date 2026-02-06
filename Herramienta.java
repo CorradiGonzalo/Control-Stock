@@ -1,26 +1,38 @@
 public abstract class Herramienta {
     protected int id;
     protected String codigo;
+    protected String descripcion;
+    protected Unidad unidad;      
+    protected String deposito;
+    protected double cantidad;    
     protected double precioBase;
-    protected int stock;
 
-    public Herramienta(String codigo, double precioBase, int stock) {
+    public Herramienta(String codigo, String descripcion, Unidad unidad, String deposito, double cantidadInput, double precioBase) {
         this.codigo = codigo;
+        this.descripcion = descripcion;
+        this.unidad = unidad;
+        this.deposito = deposito;
         this.precioBase = precioBase;
-        this.stock = stock;
+        
+        //Convertimos automáticamente a la unidad base.
+        // Si entran 1.5 Kilos, se guarda 1500.0 (Gramos)
+        this.cantidad = unidad.aUnidadBase(cantidadInput);
     }
 
-    //METODO ABSTRACTO PARA QUE LAS HIJAS DEFINAN
     public abstract double calcularPrecioLista();
 
-    //Getters y Setters
+    // GETTERS
     public String getCodigo() { return codigo; }
-    public int getStock() { return stock; }
+    public String getDescripcion() { return descripcion; }
+    public Unidad getUnidad() { return unidad; } 
+    public String getDeposito() { return deposito; }
+    public double getCantidad() { return cantidad; }
     public double getPrecioBase() { return precioBase; }
     public void setId(int id) { this.id = id; }
-    
+
     @Override
-    public String toString(){
-        return "Cod: " + codigo + " | Stock: " + stock + " | Base: $" + precioBase;
+    public String toString() {
+        return String.format("[%s] %s | Stock Base: %.3f %s | Ubic: %s", 
+               codigo, descripcion, cantidad, unidad.getSimbolo(), deposito);
     }
 }

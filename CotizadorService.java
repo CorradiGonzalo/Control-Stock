@@ -2,24 +2,22 @@
 public class CotizadorService {
     private HerramientaDAO dao = new HerramientaDAOImpl();
 
-    public double generarCotizacion(String codigo, int cantidadRequerida) throws Exception {
-        //consultamos la base
+    public double generarCotizacion(String codigo, double cantidadRequerida) throws Exception {
         Herramienta h = dao.buscarPorCodigo(codigo);
-
+        
         if (h == null) {
-            throw new Exception("El producto " + codigo + " no existe el stock.db");
+            throw new Exception("El producto " + codigo + " no existe en la base de datos.");
         }
 
-        //Verificacion de stock
-        if (h.getStock() < cantidadRequerida) {
-            System.out.println("ALERTA DE STOCK: Se requieren " + cantidadRequerida + " unidades pero hay " + h.getStock() + " en stock.db");   
-        } else { System.out.println("Stock Suficiente (" + h.getStock() + " disponible).");
+        
+        if (h.getCantidad() < cantidadRequerida) {
+            System.out.println("⚠️  ALERTA: Pides " + cantidadRequerida + " pero hay " + 
+                               h.getCantidad() + " " + h.getUnidad().getSimbolo());
+        } else {
+            System.out.println("✅  Stock suficiente (" + h.getCantidad() + " disponibles).");
         }
 
-        //calculo de precio
         double precioUnitario = h.calcularPrecioLista();
-        double total = precioUnitario * cantidadRequerida;
-
-        return total;
+        return precioUnitario * cantidadRequerida;
     }
 }
